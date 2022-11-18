@@ -2,6 +2,8 @@ package com.example.livefrontcodechallenge.di
 
 import com.example.livefrontcodechallenge.BuildConfig
 import com.example.livefrontcodechallenge.api.*
+import com.example.livefrontcodechallenge.data.ApodModelJsonAdapter
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +20,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class ApiModule {
   companion object {
-    private const val BASE_URL = "https://api.nasa.gov"
+    private const val BASE_URL = "https://api.nasa.gov/"
   }
 
   @Provides
@@ -30,16 +32,20 @@ class ApiModule {
 
   @Provides
   @Singleton
-  fun providesApodApi(okHttpClient: OkHttpClient): ApodApi =
-    buildBaseRetrofit("${BASE_URL}/planetary/apod", okHttpClient).create(ApodApi::class.java)
+  fun providesApodApi(
+    okHttpClient: OkHttpClient,
+    moshi: Moshi
+  ): ApodApi =
+    buildBaseRetrofit(okHttpClient, moshi).create(ApodApi::class.java)
 
   private fun buildBaseRetrofit(
-    path: String,
-    okHttpClient: OkHttpClient
+    okHttpClient: OkHttpClient,
+    moshi: Moshi,
+    path: String = BASE_URL
   ): Retrofit = Retrofit.Builder()
     .baseUrl(path)
     .client(okHttpClient)
-    .addConverterFactory(MoshiConverterFactory.create())
+    .addConverterFactory(MoshiConverterFactory.create(moshi))
     .build()
 
   /**
@@ -50,7 +56,7 @@ class ApiModule {
     val originalUrl = originalRequest.url()
 
     val url = originalUrl.newBuilder()
-      .addQueryParameter("apikey", BuildConfig.NASA_API_KEY)
+      .addQueryParameter(ApodApi.API_KEY, BuildConfig.NASA_API_KEY)
       .build()
     val requestBuilder: Request.Builder = originalRequest.newBuilder()
       .url(url)
