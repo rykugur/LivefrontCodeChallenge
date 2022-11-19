@@ -16,6 +16,5 @@ class RepositoryModule {
   @Singleton
   fun providesApodRepository(
     apodApi: ApodApi,
-    moshi: Moshi
-  ): ApodRepository = ApodRepository(apodApi, moshi)
+  ): ApodRepository = ApodRepository(apodApi)
 }

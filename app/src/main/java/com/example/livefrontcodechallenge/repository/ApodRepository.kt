@@ -1,29 +1,31 @@
 package com.example.livefrontcodechallenge.repository
 
 import com.example.livefrontcodechallenge.api.ApodApi
-import com.example.livefrontcodechallenge.data.ApodModel
 import com.example.livefrontcodechallenge.data.ApodResultWrapper
 import com.example.livefrontcodechallenge.data.ErrorModel
+import com.example.livefrontcodechallenge.data.ErrorModelJsonAdapter
+import com.example.livefrontcodechallenge.utils.MoshiUtils
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
 import retrofit2.HttpException
-import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
 import java.io.InvalidObjectException
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class ApodRepository(
   private val apodApi: ApodApi,
-  private val moshi: Moshi
 ) {
   private val dtFormatter = DateTimeFormatter.ofPattern(ApodApi.DATE_FORMAT)
 
   /**
-   * Gets the APOD for today's date (no parameters passed).
+   * Gets a range of APOD's and returns the wrapped result.
+   *
+   * @param startDate the startDate of the range, or 30 days before [endDate] if not given.
+   * @param endDate the endDate of the range, or today's date if not given.
    */
   suspend fun getApods(
     startDate: LocalDate? = null,
@@ -33,26 +35,30 @@ class ApodRepository(
     val start = startDate ?: end.minusDays(30)
     val queryParams = mapOf(
       ApodApi.START_DATE to dtFormatter.format(start),
-      ApodApi.END_DATE to dtFormatter.format(end)
+      ApodApi.END_DATE to dtFormatter.format(end),
     )
-    val response = apodApi.getApods(queryParams)
-    return getWrappedResult(response)
+    return getWrappedResult(queryParams)
   }
 
-  private suspend fun getWrappedResult(response: Response<List<ApodModel>>): ApodResultWrapper =
+  private suspend fun getWrappedResult(queryParams: Map<String, String>): ApodResultWrapper =
     withContext(
       Dispatchers.IO
     ) {
       kotlin.runCatching {
-        if (!response.isSuccessful) {
-          val error = response.errorBody()?.let {
-            moshi.adapter(ErrorModel::class.java).fromJson(it.source())
-          } ?: ApodResultWrapper.NetworkError
+        val response = apodApi.getApods(queryParams)
+        when (response.isSuccessful) {
+          true -> {
+            val body =
+              response.body() ?: throw InvalidObjectException("successful response had null body")
+            ApodResultWrapper.Success(body)
+          }
+          false -> {
+            response.errorBody()?.let {
+              val errorModel = convertErrorBody(it)
+              errorModel?.let { ApodResultWrapper.ApiError(errorModel) }
+            } ?: ApodResultWrapper.NetworkError
+          }
         }
-
-        val body =
-          response.body() ?: throw InvalidObjectException("successful response had null body")
-        ApodResultWrapper.Success(body)
       }.onFailure {
         Timber.d(
           it,
@@ -61,10 +67,13 @@ class ApodRepository(
       }.getOrElse { throwable ->
         when (throwable) {
           is IOException -> ApodResultWrapper.NetworkError
-          is HttpException -> convertErrorBody(throwable)?.let {
+          is HttpException -> convertErrorBody(throwable.response()?.errorBody())?.let {
             ApodResultWrapper.ApiError(it)
           } ?: ApodResultWrapper.GenericError
-          else -> ApodResultWrapper.GenericError
+          else -> {
+            Timber.d(throwable, "internal error")
+            ApodResultWrapper.GenericError
+          }
         }
       }
     }
@@ -72,12 +81,13 @@ class ApodRepository(
   /**
    * Attempts to convert an [HttpException] into an [ErrorModel], or returns null
    */
-  private fun convertErrorBody(throwable: HttpException): ErrorModel? {
+  private fun convertErrorBody(errorBody: ResponseBody?): ErrorModel? {
     return kotlin.runCatching {
-      throwable.response()?.errorBody()?.source()?.let {
-        val adapter = moshi.adapter(ErrorModel::class.java)
-        adapter.fromJson(it)
+      errorBody?.source()?.let {
+        ErrorModelJsonAdapter(MoshiUtils.getMoshiBuilder().build()).fromJson(it)
       }
+    }.onFailure {
+      Timber.d(it, "failed parsing errorBody")
     }.getOrNull()
   }
 }
