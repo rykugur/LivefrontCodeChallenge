@@ -16,7 +16,7 @@
         android:theme="@style/Theme.LivefrontCodeChallenge"
         tools:targetApi="31">
         <activity
-            android:name=".ApodListActivity"
+            android:name=".view.ApodListActivity"
             android:exported="true"
             android:theme="@style/Theme.LivefrontCodeChallenge">
             <intent-filter>

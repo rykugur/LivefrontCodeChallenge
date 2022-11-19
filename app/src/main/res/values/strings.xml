@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">LivefrontCodeChallenge</string>
+
+    <string name="network_error">Network failure, please try again later.</string>
+    <string name="generic_error">Unknown error, please contact support.</string>
+
+    <string name="label_title">Title: %s</string>
+    <string name="label_date">Date: %s</string>
 </resources>

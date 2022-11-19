@@ -53,7 +53,7 @@ class ApiModule {
    */
   private val apiKeyInterceptor: Interceptor = Interceptor { chain ->
     val originalRequest = chain.request()
-    val originalUrl = originalRequest.url()
+    val originalUrl = originalRequest.url
 
     val url = originalUrl.newBuilder()
       .addQueryParameter(ApodApi.API_KEY, BuildConfig.NASA_API_KEY)
