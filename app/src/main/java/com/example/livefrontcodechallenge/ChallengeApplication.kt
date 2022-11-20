@@ -13,6 +13,7 @@ class ChallengeApplication : Application() {
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
-    // TODO: crashlytics tree?
+    // plant other trees here as needed. Examples: a crashlytics tree to report crashes, an analytics
+    // tree to send analytics events via timber
   }
 }

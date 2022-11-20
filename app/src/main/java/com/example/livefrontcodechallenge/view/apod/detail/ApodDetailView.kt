@@ -31,6 +31,7 @@ import com.example.livefrontcodechallenge.R
 import com.example.livefrontcodechallenge.data.ApodModel
 import com.example.livefrontcodechallenge.ui.theme.LivefrontCodeChallengeTheme
 import com.example.livefrontcodechallenge.utils.dateFormatter
+import com.example.livefrontcodechallenge.utils.getDisplayableErrorMessage
 import com.example.livefrontcodechallenge.view.AppBar
 import com.example.livefrontcodechallenge.viewmodel.ApodDetailViewModel
 import com.example.livefrontcodechallenge.viewmodel.ErrorState
@@ -71,17 +72,11 @@ fun ApodDetailView(
   LivefrontCodeChallengeTheme {
     AppBar(navController) {
       error.value?.let {
-        val errorMsg = when (it) {
-          // todo: in the case of an ApiError we could do some additional error code checking
-          // to display a more user-friendly message
-          is ErrorState.ApiError -> stringResource(id = R.string.generic_error)
-          ErrorState.GenericError -> stringResource(id = R.string.generic_error)
-          ErrorState.NetworkError -> stringResource(id = R.string.network_error)
-          else -> null
-        }
-        errorMsg?.let { msg ->
-          Toast.makeText(LocalContext.current, msg, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(
+          LocalContext.current,
+          stringResource(id = it.getDisplayableErrorMessage()),
+          Toast.LENGTH_SHORT
+        ).show()
         return@AppBar
       }
       model.value?.let {

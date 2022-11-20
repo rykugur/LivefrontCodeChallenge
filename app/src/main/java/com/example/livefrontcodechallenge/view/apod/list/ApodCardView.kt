@@ -36,7 +36,6 @@ fun ApodCardView(navController: NavController, model: ApodModel) {
       .padding(6.dp, 4.dp)
       .fillMaxWidth()
       .clickable {
-        // todo:
         navController.navigate(Screen.ApodDetailScreen.route + "/${dateFormatter.format(model.date)}")
       }
   ) {

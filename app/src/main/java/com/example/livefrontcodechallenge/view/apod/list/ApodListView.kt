@@ -15,10 +15,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import com.example.livefrontcodechallenge.R
 import com.example.livefrontcodechallenge.data.ApodMediaType
 import com.example.livefrontcodechallenge.data.ApodModel
 import com.example.livefrontcodechallenge.ui.theme.LivefrontCodeChallengeTheme
+import com.example.livefrontcodechallenge.utils.getDisplayableErrorMessage
 import com.example.livefrontcodechallenge.view.AppBar
 import com.example.livefrontcodechallenge.viewmodel.ApodListViewModel
 import com.example.livefrontcodechallenge.viewmodel.ErrorState
@@ -31,7 +31,7 @@ fun ApodListView(navController: NavController) {
 
   // todo: loading indicator
   // todo: pull to refresh
-  // todo : could be fun to add ability to pick different list views, e.g. list vs grid
+  // todo: could be fun to add ability to pick different list views, e.g. list vs grid
   // or display grid view in landscape mode
   val models = remember { mutableStateListOf<ApodModel>() }
   val loading = remember { mutableStateOf(false) }
@@ -58,15 +58,11 @@ fun ApodListView(navController: NavController) {
 
   LivefrontCodeChallengeTheme {
     error.value?.let {
-      val errorMsg = when (it) {
-        // todo: in the case of an ApiError we could do some additional error code checking
-        // to display a more user-friendly message
-        is ErrorState.ApiError -> stringResource(id = R.string.generic_error)
-        ErrorState.GenericError -> stringResource(id = R.string.generic_error)
-        ErrorState.NetworkError -> stringResource(id = R.string.network_error)
-        else -> null
-      }
-      errorMsg?.let { msg -> Toast.makeText(LocalContext.current, msg, Toast.LENGTH_SHORT).show() }
+      Toast.makeText(
+        LocalContext.current,
+        stringResource(id = it.getDisplayableErrorMessage()),
+        Toast.LENGTH_SHORT
+      ).show()
       return@LivefrontCodeChallengeTheme
     }
 

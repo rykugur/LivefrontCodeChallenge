@@ -35,19 +35,3 @@ fun Navigation() {
     }
   }
 }
-
-class ApodModelNavType : NavType<ApodModel>(isNullableAllowed = false) {
-  private val adapter = MoshiUtils.getMoshiBuilder().build().adapter(ApodModel::class.java)
-
-  override fun get(bundle: Bundle, key: String): ApodModel? {
-    return adapter.fromJson(bundle.getString(key) ?: "")
-  }
-
-  override fun parseValue(value: String): ApodModel {
-    TODO("Not yet implemented")
-  }
-
-  override fun put(bundle: Bundle, key: String, value: ApodModel) {
-    bundle.putString(key, adapter.toJson(value))
-  }
-}

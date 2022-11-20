@@ -27,7 +27,7 @@ class ApodRepository(
    * @param startDate the startDate of the range, or 30 days before [endDate] if not given.
    * @param endDate the endDate of the range, or today's date if not given.
    */
-  // todo: stretch goal: return cached APODs, with some mechanism to forcefully refresh every day
+  // todo: stretch goal: return cached APODs, with some mechanism to forcefully refresh every so often
   suspend fun getApods(
     startDate: LocalDate? = null,
     endDate: LocalDate? = null
