@@ -101,6 +101,7 @@ fun ApodDetailView(
 fun TextDetails(model: ApodModel) {
   Box(
     modifier = Modifier
+      .verticalScroll(rememberScrollState())
       .fillMaxSize()
       .padding(PaddingValues(vertical = 6.dp, horizontal = 2.dp))
   ) {
@@ -136,7 +137,7 @@ fun Date(date: LocalDate) {
 
 @Composable
 fun Explanation(explanation: String) {
-  Row(modifier = Modifier.verticalScroll(rememberScrollState())) {
+  Row {
     Text(modifier = Modifier.padding(PaddingValues(top = 2.dp)), text = explanation)
   }
 }
