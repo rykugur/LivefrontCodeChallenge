@@ -71,7 +71,6 @@ private fun ApodThumbnailView(model: ApodModel) {
 
 @Composable
 private fun ApodImageThumbnailView(model: ApodModel) {
-  // todo: add placeholder image
   AsyncImage(
     modifier = Modifier
       .height(100.dp)
