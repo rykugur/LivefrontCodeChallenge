@@ -79,7 +79,6 @@ dependencies {
   //endregion
 
   //region coroutines
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_version"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_version"
   //endregion
 
@@ -113,10 +112,12 @@ dependencies {
   implementation 'com.jakewharton.timber:timber:5.0.1'
 
   //region test
-  testImplementation 'junit:junit:4.13.2'
   testImplementation 'org.junit.jupiter:junit-jupiter'
   testImplementation 'io.mockk:mockk:1.13.2'
   testImplementation "androidx.room:room-testing:$room_version"
+
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinx_coroutines_version"
+
   androidTestImplementation 'androidx.test.ext:junit:1.1.4'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
   androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"

@@ -25,11 +25,7 @@ class ApodListViewModel @Inject constructor(
   private val _stateFlow = MutableStateFlow(ApodListState())
   val stateFlow = _stateFlow.asStateFlow()
 
-  init {
-    getApods()
-  }
-
-  fun onSwipeRefresh() {
+  fun refreshApods() {
     getApods()
   }
 
