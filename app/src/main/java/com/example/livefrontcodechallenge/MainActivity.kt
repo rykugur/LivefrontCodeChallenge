@@ -1,4 +1,4 @@
-package com.example.livefrontcodechallenge.view.apod.list
+package com.example.livefrontcodechallenge
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +7,7 @@ import com.example.livefrontcodechallenge.ui.Navigation
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ApodListActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
