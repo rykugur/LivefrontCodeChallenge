@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import com.example.livefrontcodechallenge.ui.theme.LivefrontCodeChallengeTheme
 import com.example.livefrontcodechallenge.utils.dateFormatter
 import com.example.livefrontcodechallenge.utils.getDisplayableErrorMessage
 import com.example.livefrontcodechallenge.view.AppBar
+import com.example.livefrontcodechallenge.viewmodel.ApodDetailState
 import com.example.livefrontcodechallenge.viewmodel.ApodDetailViewModel
 import com.example.livefrontcodechallenge.viewmodel.ErrorState
 import java.time.LocalDate
@@ -43,27 +46,7 @@ fun ApodDetailView(
   date: String
 ) {
   val viewModel: ApodDetailViewModel = hiltViewModel()
-
-  val model = remember {
-    mutableStateOf<ApodModel?>(null)
-  }
-  val error = remember {
-    mutableStateOf<ErrorState?>(null)
-  }
-
-  val lifeCycleOwner = LocalLifecycleOwner.current
-  LaunchedEffect(key1 = true) {
-    lifeCycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-      viewModel.stateFlow.collect { state ->
-        state.error?.let {
-          error.value = it
-          return@collect
-        }
-
-        state.model?.let { model.value = it }
-      }
-    }
-  }
+  val state: ApodDetailState by viewModel.stateFlow.collectAsState()
 
   LaunchedEffect(key1 = date) {
     viewModel.getApod(date)
@@ -71,7 +54,7 @@ fun ApodDetailView(
 
   LivefrontCodeChallengeTheme {
     AppBar(navController) {
-      error.value?.let {
+      state.error?.let {
         Toast.makeText(
           LocalContext.current,
           stringResource(id = it.getDisplayableErrorMessage()),
@@ -79,7 +62,7 @@ fun ApodDetailView(
         ).show()
         return@AppBar
       }
-      model.value?.let {
+      state.model?.let {
         Box(modifier = Modifier.fillMaxSize()) {
           Column {
             AsyncImage(
