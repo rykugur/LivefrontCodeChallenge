@@ -1,6 +1,7 @@
-package com.example.livefrontcodechallenge.view;
+package com.example.livefrontcodechallenge.view.apod.list
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,11 +16,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.VideoFrameDecoder
 import com.example.livefrontcodechallenge.R
+import com.example.livefrontcodechallenge.Screen
 import com.example.livefrontcodechallenge.data.ApodMediaType
 import com.example.livefrontcodechallenge.data.ApodModel
 import java.time.format.DateTimeFormatter
@@ -27,11 +30,15 @@ import java.time.format.DateTimeFormatter
 private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE
 
 @Composable
-fun ApodCardView(model: ApodModel) {
+fun ApodCardView(navController: NavController, model: ApodModel) {
   Card(
     elevation = 4.dp, modifier = Modifier
       .padding(6.dp, 4.dp)
       .fillMaxWidth()
+      .clickable {
+        // todo:
+        navController.navigate(Screen.ApodDetailScreen.route + "/${dateFormatter.format(model.date)}")
+      }
   ) {
     Box {
       Column {
@@ -40,10 +47,10 @@ fun ApodCardView(model: ApodModel) {
           modifier = Modifier.padding(4.dp)
         ) {
           CardViewTextLabel(
-            stringResource(id = R.string.label_title, model.title)
+            stringResource(id = R.string.label_title_value, model.title)
           )
           CardViewTextLabel(
-            stringResource(id = R.string.label_date, dateFormatter.format(model.date))
+            stringResource(id = R.string.label_date_value, dateFormatter.format(model.date))
           )
         }
       }

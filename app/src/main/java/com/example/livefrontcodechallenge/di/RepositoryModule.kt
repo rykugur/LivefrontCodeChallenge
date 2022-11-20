@@ -1,6 +1,7 @@
 package com.example.livefrontcodechallenge.di
 
 import com.example.livefrontcodechallenge.api.ApodApi
+import com.example.livefrontcodechallenge.data.db.ApodDao
 import com.example.livefrontcodechallenge.repository.ApodRepository
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -16,5 +17,6 @@ class RepositoryModule {
   @Singleton
   fun providesApodRepository(
     apodApi: ApodApi,
-  ): ApodRepository = ApodRepository(apodApi)
+    apodDao: ApodDao
+  ): ApodRepository = ApodRepository(apodApi, apodDao)
 }

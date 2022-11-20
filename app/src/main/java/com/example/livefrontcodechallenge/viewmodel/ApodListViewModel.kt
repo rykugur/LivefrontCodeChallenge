@@ -11,12 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class ErrorState {
-  data class ApiError(val msg: String) : ErrorState()
-  object NetworkError : ErrorState()
-  object GenericError : ErrorState()
-}
-
 // alternatively could go with an event type system and emit events, example: emit(Success(List<ApodModel>)).
 data class ApodListState(
   val models: List<ApodModel> = listOf(),

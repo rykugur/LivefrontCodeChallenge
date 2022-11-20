@@ -1,0 +1,53 @@
+package com.example.livefrontcodechallenge.ui
+
+import android.os.Bundle
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.livefrontcodechallenge.Screen
+import com.example.livefrontcodechallenge.data.ApodModel
+import com.example.livefrontcodechallenge.utils.MoshiUtils
+import com.example.livefrontcodechallenge.view.apod.detail.ApodDetailView
+import com.example.livefrontcodechallenge.view.apod.list.ApodListView
+
+@Composable
+fun Navigation() {
+  val navController = rememberNavController()
+
+  NavHost(navController = navController, startDestination = Screen.ApodListScreen.route) {
+    composable(route = Screen.ApodListScreen.route) {
+      ApodListView(navController = navController)
+    }
+    composable(
+      route = Screen.ApodDetailScreen.route + "/{date}",
+      arguments = listOf(
+        navArgument("date") {
+          type = NavType.StringType
+        })
+    ) { entry ->
+      ApodDetailView(
+        navController = navController,
+        date = entry.arguments?.getString("date", "") ?: ""
+      )
+    }
+  }
+}
+
+class ApodModelNavType : NavType<ApodModel>(isNullableAllowed = false) {
+  private val adapter = MoshiUtils.getMoshiBuilder().build().adapter(ApodModel::class.java)
+
+  override fun get(bundle: Bundle, key: String): ApodModel? {
+    return adapter.fromJson(bundle.getString(key) ?: "")
+  }
+
+  override fun parseValue(value: String): ApodModel {
+    TODO("Not yet implemented")
+  }
+
+  override fun put(bundle: Bundle, key: String, value: ApodModel) {
+    bundle.putString(key, adapter.toJson(value))
+  }
+}

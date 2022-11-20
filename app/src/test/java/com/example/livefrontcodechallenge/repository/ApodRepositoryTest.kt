@@ -1,14 +1,17 @@
 package com.example.livefrontcodechallenge.repository
 
 import com.example.livefrontcodechallenge.api.ApodApi
+import com.example.livefrontcodechallenge.data.ApodModel
 import com.example.livefrontcodechallenge.data.ApodResultWrapper
+import com.example.livefrontcodechallenge.data.db.ApodDao
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
 import org.junit.jupiter.api.Assertions
 import retrofit2.HttpException
@@ -17,8 +20,9 @@ import java.io.IOException
 
 internal class ApodRepositoryTest {
   private val mockApi: ApodApi = mockk()
+  private val mockDao: ApodDao = mockk(relaxed = true)
 
-  private val repository: ApodRepository = ApodRepository(mockApi)
+  private val repository: ApodRepository = ApodRepository(mockApi, mockDao)
 
   @Test
   fun itReturnsSuccess() {
@@ -35,7 +39,7 @@ internal class ApodRepositoryTest {
   @Test
   fun itParsesApiError() {
     val responseBody = ResponseBody.create(
-      MediaType.parse("application/json"),
+      "application/json".toMediaTypeOrNull(),
       "{\"code\": 400, \"msg\": \"Some interesting error message\", \"service_version\": \"v1\"}"
     )
     coEvery { mockApi.getApods(any()) } throws HttpException(mockk(relaxed = true) {
@@ -54,10 +58,9 @@ internal class ApodRepositoryTest {
 
   @Test
   fun itHandlesHttpException() {
-    val responseBody = ResponseBody.create(
-      MediaType.parse("application/json"),
+    val responseBody =
       "{\"code\": 400, \"msg\": \"Some interesting error message\", \"service_version\": \"v1\"}"
-    )
+        .toResponseBody("application/json".toMediaTypeOrNull())
     coEvery { mockApi.getApods(any()) } throws HttpException(mockk(relaxed = true) {
       every { isSuccessful } returns false
       every { errorBody() } returns responseBody
@@ -82,5 +85,17 @@ internal class ApodRepositoryTest {
 
     coVerify { mockApi.getApods(any()) }
     Assertions.assertInstanceOf(ApodResultWrapper.NetworkError::class.java, wrapper)
+  }
+
+  @Test
+  fun itCachesApods() {
+    coEvery { mockApi.getApods(any()) } returns Response.success(listOf(mockk()))
+
+    runBlocking {
+      repository.getApods()
+    }
+
+    coVerify { mockApi.getApods(any()) }
+    coVerify { mockDao.insert(any<List<ApodModel>>()) }
   }
 }

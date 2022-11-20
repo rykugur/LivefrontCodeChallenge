@@ -1,5 +1,8 @@
 package com.example.livefrontcodechallenge.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.livefrontcodechallenge.data.db.ApodDao.Companion.TABLE_NAME
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -8,12 +11,15 @@ import java.time.LocalDate
 
 /**
  * DTO representing an response from the /apod endpoint.
+ *
+ * Also used as an Entity for our room DB.
  */
+@Entity(tableName = TABLE_NAME)
 @JsonClass(generateAdapter = true)
 data class ApodModel(
   val resource: Map<String, String>?,
   val title: String,
-  val date: LocalDate,
+  @PrimaryKey val date: LocalDate,
   val url: String,
   @field:Json(name = "hdurl") val hdUrl: String?,
   @field:Json(name = "media_type") val mediaType: ApodMediaType = ApodMediaType.UNKNOWN,
