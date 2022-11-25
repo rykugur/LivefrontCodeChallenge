@@ -1,20 +1,23 @@
 package com.example.livefrontcodechallenge.di
 
+import android.content.Context
+import android.net.ConnectivityManager
 import com.example.livefrontcodechallenge.BuildConfig
 import com.example.livefrontcodechallenge.api.*
-import com.example.livefrontcodechallenge.data.ApodModelJsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.IOException
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,9 +28,10 @@ class ApiModule {
 
   @Provides
   @Singleton
-  fun providesOkHttp(): OkHttpClient = OkHttpClient
+  fun providesOkHttp(@ApplicationContext appContext: Context): OkHttpClient = OkHttpClient
     .Builder()
     .addInterceptor(apiKeyInterceptor)
+    .addInterceptor(NetworkConnectivityInterceptor(appContext))
     .build()
 
   @Provides
@@ -62,5 +66,32 @@ class ApiModule {
       .url(url)
 
     return@Interceptor chain.proceed(requestBuilder.build())
+  }
+
+  private class NetworkConnectivityInterceptor(private val appContext: Context) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+      if (!isConnected()) {
+        throw IOException("no network connectivity")
+      }
+
+      return chain.proceed(chain.request())
+    }
+
+    private fun isConnected(): Boolean {
+      // if we were on API 23 or higher we could use getSystemService(ConnectivityManager::class.java) instead
+      val cm: ConnectivityManager = if (android.os.Build.VERSION.SDK_INT >= 23) {
+        appContext.getSystemService(ConnectivityManager::class.java)
+      } else {
+        appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+      }
+
+      return if (android.os.Build.VERSION.SDK_INT >= 23) {
+        val network = cm.activeNetwork
+        network != null && cm.getNetworkCapabilities(network) != null
+      } else {
+        val info = cm.activeNetworkInfo
+        info != null && info.isConnectedOrConnecting
+      }
+    }
   }
 }
