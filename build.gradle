@@ -5,6 +5,7 @@ buildscript {
     kotlin_version = '1.7.20' // latest version(s) of the compose compiler don't support kotlin 1.7.21 yet
     kotlinx_coroutines_version = '1.6.4'
     lifecycle_version = '2.5.1'
+    nav_version = '2.5.3'
     // see https://developer.android.com/jetpack/androidx/releases/compose-kotlin for more info
     room_version = "2.4.3"
   }
