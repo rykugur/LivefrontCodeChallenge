@@ -8,6 +8,7 @@ import com.example.livefrontcodechallenge.data.db.ApodDao
 import com.example.livefrontcodechallenge.utils.MoshiUtils
 import com.example.livefrontcodechallenge.utils.dateFormatter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.HttpException

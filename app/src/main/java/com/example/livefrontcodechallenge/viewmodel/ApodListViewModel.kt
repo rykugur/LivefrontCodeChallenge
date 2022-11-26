@@ -15,6 +15,7 @@ import javax.inject.Inject
 data class ApodListState(
   val models: List<ApodModel> = listOf(),
   val isLoading: Boolean = false,
+  val isInitialLoad: Boolean = false,
   val error: ErrorState? = null
 )
 
@@ -26,17 +27,17 @@ class ApodListViewModel @Inject constructor(
   val stateFlow = _stateFlow.asStateFlow()
 
   init {
-    getApods()
+    getApods(isInitialLoad = true)
   }
 
   fun onPullRefresh() {
     getApods()
   }
 
-  private fun getApods() {
+  private fun getApods(isInitialLoad: Boolean = false) {
     viewModelScope.launch {
-      _stateFlow.emit(_stateFlow.value.copy(isLoading = true))
-
+      // copy existing state so as to not throw data on screen
+      _stateFlow.emit(_stateFlow.value.copy(isInitialLoad = isInitialLoad, isLoading = true))
 
       when (val wrapper = apodRepository.getApods()) {
         is ApodResultWrapper.Success -> {
@@ -45,7 +46,7 @@ class ApodListViewModel @Inject constructor(
         is ApodResultWrapper.ApiError -> {
           with(wrapper.errorModel) {
             _stateFlow.emit(
-              _stateFlow.value.copy(
+              ApodListState(
                 isLoading = false,
                 error = ErrorState.ApiError(this.msg, this.code)
               )
@@ -53,10 +54,10 @@ class ApodListViewModel @Inject constructor(
           }
         }
         is ApodResultWrapper.NetworkError -> {
-          _stateFlow.emit(_stateFlow.value.copy(isLoading = false, error = ErrorState.NetworkError))
+          _stateFlow.emit(ApodListState(isLoading = false, error = ErrorState.NetworkError))
         }
         is ApodResultWrapper.GenericError -> {
-          _stateFlow.emit(_stateFlow.value.copy(isLoading = false, error = ErrorState.GenericError))
+          _stateFlow.emit(ApodListState(isLoading = false, error = ErrorState.GenericError))
         }
       }
     }

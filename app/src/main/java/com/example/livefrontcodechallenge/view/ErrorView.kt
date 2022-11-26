@@ -41,7 +41,6 @@ fun ErrorView(errorState: ErrorState) {
   ) {
     Image(
       modifier = Modifier
-        .padding(PaddingValues(top = 10.dp))
         .size(75.dp)
         .align(Alignment.CenterHorizontally),
       imageVector = ImageVector.vectorResource(id = R.drawable.ic_error),

@@ -11,6 +11,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,7 +24,6 @@ import com.example.livefrontcodechallenge.view.NoContentView
 import com.example.livefrontcodechallenge.viewmodel.ApodListState
 import com.example.livefrontcodechallenge.viewmodel.ApodListViewModel
 import com.example.livefrontcodechallenge.viewmodel.ErrorState
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -38,10 +38,7 @@ fun ApodListView(navController: NavController) {
   val viewModel: ApodListViewModel = hiltViewModel()
   val state: ApodListState by viewModel.stateFlow.collectAsState()
 
-  val showError = !state.isLoading && state.error != null
-  val showNoContent = !state.isLoading && !showError && state.models.isEmpty()
-
-  Timber.tag("DERP").d(".ApodListView: isLoading=${state.isLoading}; thread=${Thread.currentThread().name}")
+  val shouldShowNoContent = !state.isInitialLoad && state.error == null && state.models.isEmpty()
 
   LivefrontCodeChallengeTheme {
     AppBar(navController) {
@@ -52,17 +49,16 @@ fun ApodListView(navController: NavController) {
       Box(
         modifier = Modifier.pullRefresh(pullRefreshState)
       ) {
+        if (state.error != null) {
+          ErrorView(errorState = state.error ?: ErrorState.GenericError)
+        } else if (shouldShowNoContent) {
+          NoContentView()
+        }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-          if (showNoContent) {
-            item { NoContentView() }
-          } else if (state.error != null) {
-            item { ErrorView(errorState = state.error ?: ErrorState.GenericError) }
-          } else {
-            // for now we only display posts that have image content.
-            // videos are a stretch goal.
-            items(state.models.filter { model -> model.mediaType == ApodMediaType.IMAGE }) { model ->
-              ApodCardView(navController, model)
-            }
+          // for now we only display posts that have image content.
+          // videos are a stretch goal.
+          items(state.models.filter { model -> model.mediaType == ApodMediaType.IMAGE }) { model ->
+            ApodCardView(navController, model)
           }
         }
         PullRefreshIndicator(

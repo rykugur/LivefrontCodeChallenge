@@ -125,4 +125,22 @@ internal class ApodListViewModelTest {
 
     job.cancel()
   }
+
+  @Test
+  fun `it doesn't show no apods found on initial load`() = runTest {
+    coEvery { mockRepository.getApods() } returns ApodResultWrapper.Success(listOf(mockk()))
+
+    val results = mutableListOf<ApodListState>()
+    val viewModel = ApodListViewModel(mockRepository)
+    val job = viewModel.stateFlow
+      .onEach(results::add)
+      .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+
+    delay(100L)
+
+    assertFalse(results.all { it.isInitialLoad })
+    assertTrue(results.count { it.isLoading } == 1)
+
+    job.cancel()
+  }
 }
