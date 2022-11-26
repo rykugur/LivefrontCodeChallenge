@@ -1,6 +1,5 @@
 package com.example.livefrontcodechallenge.view.apod.detail
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,8 +26,9 @@ import com.example.livefrontcodechallenge.R
 import com.example.livefrontcodechallenge.data.ApodModel
 import com.example.livefrontcodechallenge.ui.theme.LivefrontCodeChallengeTheme
 import com.example.livefrontcodechallenge.utils.dateFormatter
-import com.example.livefrontcodechallenge.utils.errors.getDisplayableErrorMessage
 import com.example.livefrontcodechallenge.view.AppBar
+import com.example.livefrontcodechallenge.view.ErrorView
+import com.example.livefrontcodechallenge.view.NoContentView
 import com.example.livefrontcodechallenge.viewmodel.ApodDetailState
 import com.example.livefrontcodechallenge.viewmodel.ApodDetailViewModel
 import java.time.LocalDate
@@ -48,34 +47,33 @@ fun ApodDetailView(
 
   LivefrontCodeChallengeTheme {
     AppBar(navController) {
-      state.error?.let {
-        Toast.makeText(
-          LocalContext.current,
-          stringResource(id = it.getDisplayableErrorMessage()),
-          Toast.LENGTH_SHORT
-        ).show()
-        return@AppBar
-      }
-      state.model?.let {
-        Box(modifier = Modifier.fillMaxSize()) {
-          Column {
-            AsyncImage(
-              model = it.hdUrl ?: it.url, contentDescription = it.title,
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-              contentScale = ContentScale.FillWidth
-            )
-            TextDetails(model = it)
-          }
-        }
+      state.error?.let { ErrorView(errorState = it) } ?: ContentView(model = state.model)
+    }
+  }
+}
+
+@Composable
+private fun ContentView(model: ApodModel?) {
+  if (model == null) {
+    NoContentView()
+  } else {
+    Box(modifier = Modifier.fillMaxSize()) {
+      Column {
+        AsyncImage(
+          model = model.hdUrl ?: model.url, contentDescription = model.title,
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp),
+          contentScale = ContentScale.FillWidth
+        )
+        TextDetails(model = model)
       }
     }
   }
 }
 
 @Composable
-fun TextDetails(model: ApodModel) {
+private fun TextDetails(model: ApodModel) {
   Box(
     modifier = Modifier
       .verticalScroll(rememberScrollState())
@@ -91,7 +89,7 @@ fun TextDetails(model: ApodModel) {
 }
 
 @Composable
-fun Title(title: String) {
+private fun Title(title: String) {
   Row {
     Text(
       modifier = Modifier.padding(PaddingValues(end = 2.dp)),
@@ -102,7 +100,7 @@ fun Title(title: String) {
 }
 
 @Composable
-fun Date(date: LocalDate) {
+private fun Date(date: LocalDate) {
   Row {
     Text(
       modifier = Modifier.padding(PaddingValues(end = 2.dp)),
