@@ -25,7 +25,11 @@ class ApodListViewModel @Inject constructor(
   private val _stateFlow = MutableStateFlow(ApodListState())
   val stateFlow = _stateFlow.asStateFlow()
 
-  fun refreshApods() {
+  init {
+    getApods()
+  }
+
+  fun onPullRefresh() {
     getApods()
   }
 
@@ -33,18 +37,26 @@ class ApodListViewModel @Inject constructor(
     viewModelScope.launch {
       _stateFlow.emit(_stateFlow.value.copy(isLoading = true))
 
+
       when (val wrapper = apodRepository.getApods()) {
         is ApodResultWrapper.Success -> {
           _stateFlow.emit(ApodListState(models = wrapper.apodModels))
         }
         is ApodResultWrapper.ApiError -> {
-          _stateFlow.emit(ApodListState(error = ErrorState.ApiError(wrapper.errorModel.msg)))
+          with(wrapper.errorModel) {
+            _stateFlow.emit(
+              _stateFlow.value.copy(
+                isLoading = false,
+                error = ErrorState.ApiError(this.msg, this.code)
+              )
+            )
+          }
         }
         is ApodResultWrapper.NetworkError -> {
-          _stateFlow.emit(ApodListState(error = ErrorState.NetworkError))
+          _stateFlow.emit(_stateFlow.value.copy(isLoading = false, error = ErrorState.NetworkError))
         }
         is ApodResultWrapper.GenericError -> {
-          _stateFlow.emit(ApodListState(error = ErrorState.GenericError))
+          _stateFlow.emit(_stateFlow.value.copy(isLoading = false, error = ErrorState.GenericError))
         }
       }
     }

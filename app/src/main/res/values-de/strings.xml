@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">LivefrontCodeChallenge</string>
+
+    <string name="back">Zurückgehen</string>
+
+    <!--region errors-->
+    <string-array name="error_titles">
+        <item>Hoppla!</item>
+        <item>Oh!</item>
+        <item>Ouch, my knee…</item>
+    </string-array>
+
+    <string name="error_code_template">Fehlercode: %s</string>
+    <string name="error_not_found">APOD nicht gefunden, bitte kontaktieren Sie den Support.</string>
+    <string name="error_network">Netzwerkfehler, bitte versuchen Sie es später erneut.</string>
+    <string name="error_generic">Unbekannter Fehler, bitte kontaktieren Sie den Support.</string>
+    <string name="error_glitch_in_the_matrix">Es gibt einen Fehler in der Matrix:</string>
+    <!--endregion-->
+
+    <string name = "no_data">Keine APODs gefunden.</string>
+
+    <string name="label_title">Titel:</string>
+    <string name="label_title_template">Titel: %s</string>
+    <string name="label_date">Datum:</string>
+    <string name="label_date_template">Datum: %s</string>
+    <string name="label_explanation">Erklärung:</string>
+</resources>

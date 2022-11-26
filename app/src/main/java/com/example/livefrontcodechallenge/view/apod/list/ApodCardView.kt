@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -49,10 +47,10 @@ fun ApodCardView(navController: NavController, model: ApodModel) {
           modifier = Modifier.padding(4.dp)
         ) {
           CardViewTextLabel(
-            stringResource(id = R.string.label_title_value, model.title)
+            stringResource(id = R.string.label_title_template, model.title)
           )
           CardViewTextLabel(
-            stringResource(id = R.string.label_date_value, dateFormatter.format(model.date))
+            stringResource(id = R.string.label_date_template, dateFormatter.format(model.date))
           )
         }
       }

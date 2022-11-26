@@ -34,10 +34,9 @@ internal class ApodListViewModelTest {
       .onEach(results::add)
       .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-    viewModel.refreshApods()
     delay(100L)
 
-    assertTrue(results.any { it.isLoading })
+    assertTrue(results.count { it.isLoading } == 1)
 
     job.cancel()
   }
@@ -52,10 +51,26 @@ internal class ApodListViewModelTest {
       .onEach(results::add)
       .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-    viewModel.refreshApods()
     delay(100L)
 
-    assertTrue(results.any { it.models.isNotEmpty() })
+    assertTrue(results.count { it.models.isNotEmpty() } == 1)
+
+    job.cancel()
+  }
+
+  @Test
+  fun `it refreshes on swipe`() = runTest {
+    coEvery { mockRepository.getApods() } returns ApodResultWrapper.Success(listOf(mockk()))
+
+    val results = mutableListOf<ApodListState>()
+    val viewModel = ApodListViewModel(mockRepository)
+    val job = viewModel.stateFlow
+      .onEach(results::add)
+      .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+
+    delay(100L)
+
+    assertTrue(results.count { it.models.isNotEmpty() } == 1)
 
     job.cancel()
   }
@@ -70,10 +85,9 @@ internal class ApodListViewModelTest {
       .onEach(results::add)
       .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-    viewModel.refreshApods()
     delay(100L)
 
-    assertTrue(results.any { it.error is ErrorState.ApiError })
+    assertTrue(results.count { it.error is ErrorState.ApiError } == 1)
 
     job.cancel()
   }
@@ -88,10 +102,9 @@ internal class ApodListViewModelTest {
       .onEach(results::add)
       .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-    viewModel.refreshApods()
     delay(100L)
 
-    assertTrue(results.any { it.error is ErrorState.NetworkError })
+    assertTrue(results.count { it.error is ErrorState.NetworkError } == 1)
 
     job.cancel()
   }
@@ -106,10 +119,9 @@ internal class ApodListViewModelTest {
       .onEach(results::add)
       .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-    viewModel.refreshApods()
     delay(100L)
 
-    assertTrue(results.any { it.error is ErrorState.GenericError })
+    assertTrue(results.count { it.error is ErrorState.GenericError } == 1)
 
     job.cancel()
   }

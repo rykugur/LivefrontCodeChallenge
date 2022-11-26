@@ -3,12 +3,25 @@
 
     <string name="back">Back</string>
 
-    <string name="network_error">Network failure, please try again later.</string>
-    <string name="generic_error">Unknown error, please contact support.</string>
+    <!--region errors-->
+    <string-array name="error_titles">
+        <item>Uh oh!</item>
+        <item>Whoa!</item>
+        <item>Ouch, my knee…</item>
+    </string-array>
+
+    <string name="error_code_template">Error code: %s</string>
+    <string name="error_not_found">APOD not found, please contact support.</string>
+    <string name="error_network">Network failure, please try again later.</string>
+    <string name="error_generic">Unknown error, please contact support.</string>
+    <string name="error_glitch_in_the_matrix">There\'s a glitch in the Matrix:</string>
+    <!--endregion-->
+
+    <string name = "no_data">No APODs found.</string>
 
     <string name="label_title">Title:</string>
-    <string name="label_title_value">Title: %s</string>
+    <string name="label_title_template">Title: %s</string>
     <string name="label_date">Date:</string>
-    <string name="label_date_value">Date: %s</string>
+    <string name="label_date_template">Date: %s</string>
     <string name="label_explanation">Explanation:</string>
 </resources>
