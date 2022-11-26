@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.livefrontcodechallenge.data.ApodModel
 import com.example.livefrontcodechallenge.data.db.ApodDao
-import com.example.livefrontcodechallenge.data.db.ApodDatabase
-import com.example.livefrontcodechallenge.repository.ApodRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

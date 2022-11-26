@@ -1,6 +1,5 @@
 package com.example.livefrontcodechallenge.ui
 
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -8,8 +7,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.livefrontcodechallenge.Screen
-import com.example.livefrontcodechallenge.data.ApodModel
-import com.example.livefrontcodechallenge.utils.MoshiUtils
 import com.example.livefrontcodechallenge.view.apod.detail.ApodDetailView
 import com.example.livefrontcodechallenge.view.apod.list.ApodListView
 
