@@ -38,10 +38,8 @@ internal class ApodRepositoryTest {
 
   @Test
   fun itParsesApiError() {
-    val responseBody = ResponseBody.create(
-      "application/json".toMediaTypeOrNull(),
-      "{\"code\": 400, \"msg\": \"Some interesting error message\", \"service_version\": \"v1\"}"
-    )
+    val responseBody = "{\"code\": 400, \"msg\": \"Some interesting error message\", \"service_version\": \"v1\"}"
+      .toResponseBody("application/json".toMediaTypeOrNull())
     coEvery { mockApi.getApods(any()) } throws HttpException(mockk(relaxed = true) {
       every { isSuccessful } returns false
       every { errorBody() } returns responseBody
